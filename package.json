@@ -1,0 +1,19 @@
+{
+  "name": "my-mangasteen-source",
+  "version": "1.0.0",
+  "description": "A source extension for the Mangasteen manga reader app",
+  "author": "CoderTheory",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "local": "node local_runner.js",
+    "build": "esbuild sources/my-source/main.js --bundle --outfile=sources/my-source/release.js --platform=browser --target=es2020 --format=cjs"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "cheerio": "^1.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0"
+  }
+}
