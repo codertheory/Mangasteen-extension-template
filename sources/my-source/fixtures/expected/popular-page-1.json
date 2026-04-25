@@ -1,0 +1,20 @@
+[
+  {
+    "title": "One Piece",
+    "url": "https://example.com/manga/one-piece",
+    "coverUrl": "https://example.com/cover/op.jpg",
+    "status": "Ongoing",
+    "description": "",
+    "author": "",
+    "artist": ""
+  },
+  {
+    "title": "Naruto",
+    "url": "https://example.com/manga/naruto",
+    "coverUrl": "https://example.com/cover/n.jpg",
+    "status": "Ongoing",
+    "description": "",
+    "author": "",
+    "artist": ""
+  }
+]

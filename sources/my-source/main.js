@@ -1,51 +1,18 @@
+/// <reference path="./host-globals.d.ts" />
+
 /**
  * @name My Source Name
  * @version 1.0
  * @lang en
  * @iconUrl https://example.com/favicon.png
+ *
+ * Prefer declaring metadata in `extension.json` (sibling file). The host reads
+ * it at install time — fields there override these JSDoc tags.
  */
 
-// ---------------------------------------------------------------------------
-// Globals injected by the Mangasteen app's embedded JS engine.
-// Do NOT import or require anything — extensions run in a sandboxed engine
-// with no module system.
-// ---------------------------------------------------------------------------
-
-/**
- * @typedef {Object} KsoupElement
- * @property {string} text              - The visible text content of the element
- * @property {string} outerHtml         - The full outer HTML of the element
- * @property {string} innerHtml         - The inner HTML of the element
- * @property {Object.<string, string>} attr - Map of attribute name → value
- */
-
-/**
- * @typedef {Object} HttpOptions
- * @property {string} [method]                      - HTTP method (default: "GET")
- * @property {Object.<string, string>} [headers]    - Request headers
- * @property {Object.<string, string>} [params]     - URL query parameters
- * @property {string} [body]                        - Raw request body string
- */
-
-/**
- * @typedef {Object} HttpResponse
- * @property {string} body   - Response body as a string
- * @property {string} url    - Final URL after any redirects
- * @property {number} status - HTTP status code
- */
-
-/**
- * Makes an HTTP GET request. Injected by the app at runtime.
- * @type {function(string, HttpOptions=): Promise<HttpResponse>}
- */
-const httpGet = globalThis.httpGet;
-
-/**
- * Parses an HTML string and returns all elements matching a CSS selector.
- * Injected by the app at runtime.
- * @type {function(string, string): KsoupElement[]}
- */
-const ksoupSelect = globalThis.ksoupSelect;
+// Globals (httpGet / ksoupSelect / crypto / clearCookies) and source-function
+// signatures are declared in host-globals.d.ts — run `npm run typecheck` to
+// have tsc --noEmit validate this file against the host contract.
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -70,7 +37,7 @@ const BASE_URL = 'https://example.com';
  *   description: string,
  *   author: string,
  *   artist: string,
- *   genres?: string
+ *   genres?: string[]
  * }>>}
  */
 globalThis.getPopularManga = async function getPopularManga(page) {
@@ -114,7 +81,7 @@ globalThis.getPopularManga = async function getPopularManga(page) {
  *   description: string,
  *   author: string,
  *   artist: string,
- *   genres?: string
+ *   genres?: string[]
  * }>>}
  */
 globalThis.getLatestManga = async function getLatestManga(page) {
@@ -160,7 +127,7 @@ globalThis.getLatestManga = async function getLatestManga(page) {
  *   description: string,
  *   author: string,
  *   artist: string,
- *   genres?: string
+ *   genres?: string[]
  * }>>}
  */
 globalThis.searchManga = async function searchManga(query, page) {
@@ -208,14 +175,14 @@ globalThis.searchManga = async function searchManga(query, page) {
  *     description: string,
  *     author: string,
  *     artist: string,
- *     genres: string,
- *     lastUpdate: string
+ *     genres: string[],
+ *     lastUpdate: number
  *   },
  *   chapters: Array<{
  *     name: string,
  *     url: string,
  *     number: number,
- *     uploadDate: string
+ *     uploadDate: number
  *   }>
  * } | null>}
  */
@@ -230,7 +197,7 @@ globalThis.getMangaDetails = async function getMangaDetails(url) {
         const authorEl = ksoupSelect(html, '.author')[0];
 
         const genreEls = ksoupSelect(html, '.genres a');
-        const genres   = genreEls.map(el => el.text.trim()).join(', ');
+        const genres   = genreEls.map(el => el.text.trim()).filter(Boolean);
 
         const manga = {
             title:       titleEl  ? titleEl.text.trim()  : '',
@@ -241,7 +208,8 @@ globalThis.getMangaDetails = async function getMangaDetails(url) {
             author:      authorEl ? authorEl.text.trim()  : '',
             artist:      authorEl ? authorEl.text.trim()  : '',
             genres:      genres,
-            lastUpdate:  '',
+            // Unix epoch ms; 0 when the source doesn't expose a "last updated" timestamp.
+            lastUpdate:  0,
         };
 
         const chapters = parseChapters(html);
@@ -262,7 +230,7 @@ globalThis.getMangaDetails = async function getMangaDetails(url) {
  *   name: string,
  *   url: string,
  *   number: number,
- *   uploadDate: string
+ *   uploadDate: number
  * }>>}
  */
 globalThis.getChapterList = async function getChapterList(url) {
@@ -301,7 +269,7 @@ globalThis.getPageList = async function getPageList(url) {
  * Adapt the selectors to match your source's HTML structure.
  *
  * @param {string} html
- * @returns {Array<{ name: string, url: string, number: number, uploadDate: string }>}
+ * @returns {Array<{ name: string, url: string, number: number, uploadDate: number }>}
  */
 function parseChapters(html) {
     const rows = ksoupSelect(html, '.chapter-list .chapter');
@@ -317,11 +285,16 @@ function parseChapters(html) {
         const match = name.match(/Chapter\s+([0-9.]+)/i);
         const number = match ? parseFloat(match[1]) : -1.0;
 
+        // Unix epoch ms. Replace Date.parse with a source-specific parser when
+        // the site uses a custom format (e.g. "2 days ago").
+        const parsedDate = dateEl ? Date.parse(dateEl.text.trim()) : NaN;
+        const uploadDate = Number.isFinite(parsedDate) ? parsedDate : 0;
+
         chapters.push({
             name:       name,
             url:        linkEl.attr['href'],
             number:     number,
-            uploadDate: dateEl ? dateEl.text.trim() : '',
+            uploadDate: uploadDate,
         });
     }
     return chapters;

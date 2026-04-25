@@ -1,0 +1,7 @@
+[
+  {
+    "url": "https://example.com/popular",
+    "method": "GET",
+    "response": "popular.html"
+  }
+]

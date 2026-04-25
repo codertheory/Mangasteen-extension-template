@@ -1,0 +1,7 @@
+[
+  {
+    "name": "popular-page-1",
+    "function": "getPopularManga",
+    "args": [1]
+  }
+]

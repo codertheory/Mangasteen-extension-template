@@ -1,0 +1,20 @@
+{
+  "name": "My Source Name",
+  "version": "1.0",
+  "lang": "en",
+  "iconUrl": "https://example.com/favicon.png",
+  "icon": "icon.png",
+  "apiVersion": 1,
+  "hostAllowlist": [
+    "example.com",
+    ".cdn.example.com"
+  ],
+  "capabilities": [],
+  "nsfw": false,
+  "maxRequestsPerSecond": 2,
+  "cachePolicy": {
+    "getPopularManga": 300,
+    "getLatestManga": 120,
+    "getChapterList": 600
+  }
+}
