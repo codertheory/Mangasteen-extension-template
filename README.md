@@ -65,8 +65,8 @@ Preferred over the JSDoc header. Every field in the folder layout is read from `
 | `icon` | string? | Relative path to a bundled icon asset; the host downloads it once and caches it locally |
 | `apiVersion` | int | Contract version you're targeting. Current supported value: `1`. Sources outside the supported range are rejected. |
 | `hostAllowlist` | string[] | Hostnames (or `.suffix` wildcards) the host will let `httpGet` call. Empty = trust-mode (no enforcement). **Strongly recommended.** |
-| `capabilities` | string[] | Free-form feature flags the UI surfaces at install time. Known values: `"cookies"` (uses persistent cookie jar), `"descrambler"` (emits `#descrambler=…` page URL fragments). |
-| `nsfw` | bool | Content rating; the UI may gate access behind a setting |
+| `capabilities` | string[] | Free-form feature flags the UI surfaces at install time. Known values: `"cookies"` (uses persistent cookie jar), `"descrambler"` (emits `#descrambler=…` page URL fragments), `"blurUntaggedCovers"` (with `nsfw`, blurs untagged listing covers while the Spicy Filter is on; only for mostly-adult sources whose listings have no tags, app 3.4.0+). |
+| `nsfw` | bool | Content rating. The app shows a 🌶️ next to the source name. Titles are hidden by the Spicy Filter based on their tags (`18+`, `Adult`, `Smut`), so fill `genres` on listings where the site shows them |
 | `maxRequestsPerSecond` | int? | Host-side token-bucket rate limit applied to every `httpGet`. Omit or set `null` for no limit. |
 | `cachePolicy` | map<string,int> | Per-function response TTL in seconds. Keys are function names (`getPopularManga`, `getLatestManga`, `searchManga`, `getMangaDetails`, `getChapterList`, `getPageList`). Functions not listed are not cached. |
 
