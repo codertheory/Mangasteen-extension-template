@@ -11,7 +11,13 @@
         "host-globals.d.ts",
         "icon.png",
         "main.js"
-      ]
+      ],
+      "fileHashes": {
+        "extension.json": "63fbe508b6175dec1c5d61ac7ef3a834daefbd83051773b3a51ee47b239ff1dc",
+        "host-globals.d.ts": "52713f841b0fc896c8ece504abe699f1bddc471c3589de8372fe6aa15458d05e",
+        "icon.png": "c61deff18c30150b4910f73c0f8fbb7d9a5cf96c4cc95026d87336c232f40daa",
+        "main.js": "140b82411ff25b59a5749177148d7f01410791d4cefc59baa56c66a8f7d91aab"
+      }
     }
   ]
 }

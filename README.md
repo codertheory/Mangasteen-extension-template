@@ -275,7 +275,7 @@ On add, the host fetches your public key once and stores it on the repo entity (
 
 ## index.json
 
-`index.json` at the repository root lists every source in `sources/`: its path, name, version, a hash of its files and the list of those files. Mangasteen 3.4.1 and later read it from `raw.githubusercontent.com`, so a refresh takes one request plus a download of only the sources whose hash changed.
+`index.json` at the repository root lists every source in `sources/`: its path, name, version, a hash of its files and the list of those files. Mangasteen 3.4.1 and later read it from `raw.githubusercontent.com`, so a refresh takes one request plus a download of only the sources whose hash changed. Each file's sha256 is listed too, so the app can tell a fresh file from a cached old one.
 
 Repositories without an `index.json` still work, but they are subject to GitHub's API rate limit.
 
