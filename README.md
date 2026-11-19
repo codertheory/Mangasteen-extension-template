@@ -12,13 +12,12 @@ Extensions run in a **sandboxed QuickJS VM** with no module system. You cannot u
 
 ## Source file layout
 
-The app only loads extensions found inside the `sources/` root folder. Two layouts are supported:
+The app only loads extensions found inside the `sources/` root folder. Each source lives in its own folder:
 
 ```
 sources/
-  mangakatana.js          # flat file — filename becomes the source ID
   mangadex/
-    main.js               # folder layout — folder name becomes the source ID
+    main.js               # entry file, folder name becomes the source ID
     extension.json        # manifest (strongly recommended)
     icon.png              # optional bundled icon (referenced from manifest)
     main.js.sig           # optional Ed25519 signature over main.js
@@ -26,9 +25,8 @@ sources/
 
 Rules:
 - Extensions **must** be plain `.js` files. TypeScript is not supported at runtime, but you can use `host-globals.d.ts` for autocomplete.
-- Folder layout: the entry file must be named exactly `main.js`.
-- Flat layout: place the `.js` file directly under `sources/` with any name.
-- Flat files rely on the JSDoc header (see below). For anything non-trivial — signing, capabilities, rate limits — use the folder layout with an `extension.json`.
+- The entry file must be named exactly `main.js`.
+- Flat files placed directly under `sources/` are not supported and are rejected by `npm run index`.
 
 ---
 
@@ -72,7 +70,7 @@ Preferred over the JSDoc header. Every field in the folder layout is read from `
 
 ### JSDoc fallback
 
-For flat-file sources (or folder-layout sources without an `extension.json`), the host scrapes a JSDoc block at the top of `main.js`:
+For sources without an `extension.json`, or with a manifest that leaves a field out, the host scrapes a JSDoc block at the top of `main.js`:
 
 ```js
 /**
@@ -104,8 +102,11 @@ npm run test
 # 6. Type-check against the host contract
 npm run typecheck
 
-# 7. Build for release (folder layout only — bundles imports into one main.js)
+# 7. Build for release (bundles imports into one main.js)
 npm run build
+
+# 8. Regenerate index.json, then commit it with your changes
+npm run index
 ```
 
 The bundled `release.js` is what you publish; the host loads it as `main.js` inside the folder (adjust your repo layout or the bundler output path accordingly).
@@ -269,6 +270,36 @@ On add, the host fetches your public key once and stores it on the repo entity (
 - Sources without a `.sig` install as `"Signature unverified"` but still work (unless your users have toggled strict mode).
 - Sources whose signatures don't match are **rejected**; the repo shows a sync error.
 - Rotating `publickey.pem` at the same URL will force re-verification on next sync — existing sources that can't verify against the new key fail.
+
+---
+
+## index.json
+
+`index.json` at the repository root lists every source in `sources/`: its path, name, version, a hash of its files and the list of those files. Mangasteen 3.4.1 and later read it from `raw.githubusercontent.com`, so a refresh takes one request plus a download of only the sources whose hash changed.
+
+Repositories without an `index.json` still work, but they are subject to GitHub's API rate limit.
+
+Run `npm run index` after any change to a source, and again after signing, because the signature files are part of the hash. A GitHub Actions check (`index-check`) fails when the committed `index.json` is stale.
+
+Flat `.js` files directly under `sources/` are rejected. Move `sources/<name>.js` into `sources/<name>/main.js`.
+
+---
+
+## Sharing your repository
+
+Link people straight to the add-repository screen in Mangasteen:
+
+```
+https://mangasteen.codertheory.dev/add?url=<repository url>
+```
+
+Add `&branch=<name>` to point at a branch other than the default. URL-encode the repository URL. For example:
+
+```
+https://mangasteen.codertheory.dev/add?url=https%3A%2F%2Fgithub.com%2Fcodertheory%2Fmangasteen-repo
+```
+
+The link opens a page with an "Open in Mangasteen" button, which leads to the app's add-repository confirmation screen. Nothing is installed until the user confirms. This needs Mangasteen 3.4.1 or later.
 
 ---
 
