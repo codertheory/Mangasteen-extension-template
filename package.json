@@ -7,6 +7,7 @@
   "type": "commonjs",
   "scripts": {
     "local": "node local_runner.js",
+    "index": "node scripts/build-index.mjs",
     "test": "node local_runner.js --fixtures",
     "typecheck": "tsc --noEmit",
     "build": "esbuild sources/my-source/main.js --bundle --outfile=sources/my-source/release.js --platform=browser --target=es2020 --format=cjs"

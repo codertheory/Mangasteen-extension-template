@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+  "sources": [
+    {
+      "path": "sources/my-source",
+      "name": "My Source Name",
+      "version": "1.0",
+      "hash": "sha256-44ce6f8a76317aced693bbe4ecf7e59ac2b27b8786d476d322a5c74a2b0afd35",
+      "files": [
+        "extension.json",
+        "host-globals.d.ts",
+        "icon.png",
+        "main.js"
+      ]
+    }
+  ]
+}
